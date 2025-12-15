@@ -99,14 +99,14 @@ SynthDef(\resoMorph, {
 
 	dry = LPF.ar(dry, dryWetLFO.pow(2).linexp(1, 0, 500, 20000));
 	sig = HPF.ar(sig, dryWetLFO.pow(2).linexp(1, 0, 50, 1500));
-	sig = XFade2.ar(dry, sig * 0.dbamp, dryWetLFO * 2 - 1);
+	sig = XFade2.ar(dry, sig * 2.dbamp, dryWetLFO * 2 - 1);
 
 	Out.ar(\out.kr(0), sig * \amp.kr(1, lag));
 }).add;
 
 SynthDef(\resoGrains, {
 	var sig, low, hi, med;
-	var dry = PlayBuf.ar(1, \buf.kr(0), loop: 1);
+	var dry = In.ar(\in.kr(0), 1);
 	var lfoMod = SinOsc.kr(freq: \innerRate.kr(0.0005), phase: Rand(-3pi/2, 3pi/2)).exprange(\minLfoRate.kr(0.001), \maxLfoRate.kr(0.05));
 	var dryWetLFO = SinOsc.kr(freq: lfoMod, phase: Rand(-3pi/2, 3pi/2)).range(0, \depth.kr(1)).lincurve(0, \depth.kr, 0, \depth.kr, \curve.kr(-3));
 	var minFreq = \minFreq.kr(90);

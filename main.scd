@@ -2,19 +2,20 @@ ServerOptions.devices.do{ |device| device.postln; };
 (
 Server.killAll;
 Buffer.freeAll;
-~nChans = 4;
+~nChans = 2;
+// ~nOuts = ~nChans * 8;
 ~sr = 48000;
 
 ~paths = Dictionary.new();
 
 s = Server.local;
 s.options.outDevice_(
-	// "MacBook Pro Speakers"
+	"MacBook Pro Speakers"
 	// "External Headphones"
 	// "ZoomAudioD"
 	// "Audio Out"
 	// "Ryan’s AirPods P"
-	"Scarlett 4i4 USB"
+	// "Scarlett 4i4 USB"
 );
 // s.options.inDevice_("Built-in Microph");
 s.options.numOutputBusChannels_(~nChans);

@@ -2,7 +2,10 @@
 // -------------------------------------- Pads -------------------------------------- //
 
 SynthDef(\player, {
-	var sig = PlayBuf.ar(1, \buf.kr(0), rate: \rate.kr(1), startPos: \startPos.kr(0), loop: 1);
+	var buf = \buf.kr(0);
+	var rate = \rate.kr(1);
+	var start = (\startPos.kr(0) * BufFrames.kr(buf).asInteger);
+	var sig = PlayBuf.ar(1, buf, rate: BufRateScale.kr(buf) * rate, startPos: start, loop: 1);
 
 	sig = sig * Env.asr(\attackTime.kr(10), 1, \releaseTime.kr(10), curve: 4).kr(Done.freeSelf, \gate.kr(1));
 
