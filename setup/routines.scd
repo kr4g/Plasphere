@@ -68,7 +68,7 @@
 
 				playSynth = Synth(\player, [
 					buf: buf,
-					amp: ~amps["land"] * -4.dbamp,
+					amp: ~amps["land"] * -5.dbamp,
 					rate: rrand(0.8, 1),
 					startPos: rrand(0.0, 0.5),
 					attackTime: dur * 0.25,
@@ -82,7 +82,7 @@
 						var gBuf = PathName(~paths[\buffers] ++ "Audio/Sources/land").files.choose.fileName;
 						synths[i] = Synth(\grainTrigs, [
 							buf: gBuf,
-							amp: ~amps["land"] * 2.dbamp,
+							amp: ~amps["land"] * 3.dbamp,
 							minRate: rrand(0.5, 1),
 							maxRate: rrand(20.0, 60),
 							attackTime: rrand(dur * 0.1, dur * 0.25),
@@ -181,18 +181,6 @@
 		releaseTime: dur * 0.25,
 		out: ~boatCptBus],
 	s, \addToHead);
-
-	(dur * 0.75).wait;
-
-	if (rand(1.0) < 0.25) {
-		pvSynth = Synth(\pvAmb, [
-			buf: ~specBufs[file.replace(".wav", "_spec.wav")],
-			amp: rrand(-11.0, -6).dbamp,
-			maxRate: rrand(0.05, 0.1),
-			releaseTime: 20,
-			out: ~waterPvBus],
-		s, \addToHead);
-	};
 });
 
 // MACHINES
@@ -209,23 +197,34 @@
 	("Starting % layer for ".format(layer) ++ duration.round(0.1) ++ " seconds").postln;
 	("[%] ".format(layer) ++ file).postln;
 
-	playSynth = Synth(\player, [
-		\buf: buf,
-		amp: ~amps[layer],
-		rate: rrand(0.8, 1.1),
-		startPos: rrand(0.0, 0.5),
-		attackTime: duration * 0.25,
-		sustainTime: duration * 0.5,
-		releaseTime: duration * 0.25,
-		out: ~machinesPlayBus],
-	s, \addToHead);
+	if (rand(1.0) < 0.5) {
+		playSynth = Synth(\player, [
+			buf: buf,
+			amp: ~amps[layer],
+			rate: rrand(0.8, 1.1),
+			startPos: rrand(0.0, 0.5),
+			attackTime: duration * 0.25,
+			sustainTime: duration * 0.5,
+			releaseTime: duration * 0.25,
+			out: ~machinesPlayBus],
+		s, \addToHead);
+	} {
+		granSynth = Synth(\grainBuzz, [
+			buf: buf,
+			amp: ~amps[layer],
+			attackTime: duration * 0.25,
+			sustainTime: duration * 0.5,
+			releaseTime: duration * 0.25,
+			out: ~machinesPlayBus],
+		s, \addToHead);
+	};
 
 	(duration * 0.75).wait;
 
-	if (rand(1.0) < 0.5) {
+	if (rand(1.0) < 0.25) {
 		pvSynth = Synth(\pvAmb, [
 			buf: spec,
-			amp: ~amps[layer] * rrand(0.05, 0.15),
+			amp: ~amps[layer] * rrand(0.1, 0.25),
 			maxRate: exprand(0.1, 0.2),
 			offset: 0,
 			attackTime: 10,
@@ -238,11 +237,52 @@
 
 // RANDOM GRAINS
 ~grainStreamsRoutine = Routine({
-	8.do{
+	12.do{
 		var layer = ~layers.choose;
 		var file = PathName(~paths[\buffers] ++ "Audio/Sources/" ++ layer).files.choose.fileName;
 		var buf = ~audioBufs[file], spec = ~specBufs[file.replace(".wav", "_spec.wav")];
-		Synth(\granStorm, [buf: buf, duration: rrand(10.0, 30), amp: -18.dbamp, out: ~streamsBus]);
+		Synth(\granStorm, [buf: buf, duration: rrand(10.0, 30), amp: rrand(-18.dbamp, -8.dbamp).dbamp, out: ~streamsBus]);
+		rrand(0.5, 3).wait;
+	};
+});
+
+// GRAIN MORPHS
+~grainMorphsRoutine = Routine({
+	8.do{
+		var file1 = PathName(~paths[\buffers] ++ "Audio/Sources/" ++ ["humans", "machines"].choose).files.choose.fileName.postln;
+		var sndBuf1 = ~audioBufs[file1];
+		var file2 = PathName(~paths[\buffers] ++ "Audio/Sources/" ++ ["water", "land"].choose).files.choose.fileName.postln;
+		var sndBuf2 = ~audioBufs[file2];
+
+		var atk = rrand(5, 20);
+		var rel = rrand(5, 20);
+		var sus = rrand(atk + rel * 2, atk + rel * 4);
+
+		Synth(\grainMorpher, [
+			buf1: sndBuf1,
+			buf2: sndBuf2,
+			attackTime: atk,
+			sustatinTime: sus,
+			releaseTime: rel,
+			out: ~grainMorph
+		]);
+		// Synth(\grainBuzz, [
+		// 	buf: sndBuf1,
+		// 	attackTime: atk,
+		// 	sustatinTime: sus,
+		// 	releaseTime: rel,
+		// 	out: ~grainMorph1
+		// ]);
+		//
+		// Synth(\grainBuzz, [
+		// 	buf: sndBuf2,
+		// 	attackTime: atk,
+		// 	sustatinTime: sus,
+		// 	releaseTime: rel,
+		// 	out: ~grainMorph2
+		// ]);
+
+		rrand(atk + rel, sus).wait;
 	};
 });
 )

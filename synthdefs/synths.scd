@@ -66,11 +66,42 @@ SynthDef(\grainTrigs, {
 	Out.ar(\out.kr(0), sig * 3.dbamp * \amp.kr(1));
 }).add;
 
+SynthDef(\grainMorpher, {
+	var buf1 = \buf1.kr(0);
+	var buf2 = \buf2.kr(0);
+	var start1 = 4.collect{(Rand(0.0, 0.75) * BufFrames.kr(buf1).asInteger)};
+	var start2 = 4.collect{(Rand(0.0, 0.75) * BufFrames.kr(buf2).asInteger)};
+	var rate1 = 4.collect{Rand(0.9, 1.5)};
+	var rate2 = 4.collect{Rand(0.9, 1.5)};
+	var in1 = PlayBuf.ar(1, buf1, rate: BufRateScale.kr(buf1) * rate1, startPos: start1, loop: 1).sum;
+	var in2 = PlayBuf.ar(1, buf2, rate: BufRateScale.kr(buf2) * rate2, startPos: start2, loop: 1).sum;
+	var chain1, chain2, resyn, sig;
+	var minRate = 15, maxRate = 60;
+	var rate = LFNoise1.kr(ExpRand(0.1, 0.7)).exprange(minRate, maxRate);
+
+	chain1 = FFT(LocalBuf(2048*2), in1);
+	chain2 = FFT(LocalBuf(2048*2), in2);
+
+	resyn = IFFT(PV_Morph(chain1, chain2, 0.5));
+
+	sig = GrainIn.ar(
+		1,
+		Impulse.ar(rate),
+		rate.explin(minRate, maxRate, 0.01, 0.005),
+		resyn,
+		mul: 4.dbamp
+	);
+
+	sig = sig * Env.linen(\attackTime.kr(5), \sustainTime.kr(10), \releaseTime.kr(5), curve: [2, -2]).kr(Done.freeSelf);
+
+	Out.ar(\out.kr(0), sig * \amp.kr(1));
+}).add;
+
 // --------------------------------------  One-Shots -------------------------------------- //
 
 SynthDef(\granStorm, {
 	var dur = \duration.kr(20);
-	var sig = Mix.fill(4, {
+	var sig = Mix.fill(8, {
 		var minRate = \minRate.kr(15);
 		var maxRate = \maxRate.kr(50);
 		var rateScaleMin = \rateScaleMin.kr(0.9);

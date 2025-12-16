@@ -91,12 +91,17 @@ var sndBuf = ~audioBufs[file];
 }.play;
 )
 
+
+Synth.tail(nil, \ampModMono)
+Synth.tail(nil, \resoGrains)
+
 (
 var layer = ~layers.choose;
 var file = PathName(~paths[\buffers] ++ "Audio/Sources/" ++ layer).files.choose.fileName;
 var sndBuf = ~audioBufs[file];
 "%, %".format(layer, file).postln;
-Synth(\grainBuzz, [buf: sndBuf, maxRate: rrand(10.0, 60), amp: -12.dbamp]);
+// Synth(\grainBuzz, [buf: sndBuf, maxRate: rrand(10.0, 60), amp: -18.dbamp]);
+Synth(\granStorm, [buf: sndBuf, duration: rrand(20.0, 30), amp: -18.dbamp]);
 )
 
 
@@ -179,36 +184,36 @@ z = Buffer.sendCollection(s, winenv.discretize, 1);
 
 (
 var allFiles = ~layers.collect { |layer|
-    PathName(~paths[\buffers] ++ "Audio/Sources/" ++ layer).files
+	PathName(~paths[\buffers] ++ "Audio/Sources/" ++ layer).files
 }.flatten;
 var selectedFiles = allFiles.scramble.keep(20.min(allFiles.size));
 var sndBufs = selectedFiles.collect { |f|
-    var buf = ~audioBufs[f.fileName];
-    if(buf.notNil) {
-        ("Using: " ++ f.fileName).postln;
-    };
-    buf;
+	var buf = ~audioBufs[f.fileName];
+	if(buf.notNil) {
+		("Using: " ++ f.fileName).postln;
+	};
+	buf;
 }.select(_.notNil);
 
 ("Total files found: " ++ allFiles.size).postln;
 ("Using " ++ sndBufs.size ++ " buffers").postln;
 
 {
-    var sig = Mix.fill(sndBufs.size, { |i|
+	var sig = Mix.fill(sndBufs.size, { |i|
 		// var rate = Rand(20, 50.0);
 		var rate = LFNoise1.kr(ExpRand(0.01, 0.03)).exprange(10, 40.0);
-        var trig = Impulse.ar(rate);
-        var dur = rate.linlin(10, 40, 0.01, 0.001);
+		var trig = Impulse.ar(rate);
+		var dur = rate.linlin(10, 40, 0.01, 0.001);
 		// var posMod = SinOsc.kr(ExpRand(0.01, 0.02)).range(1, 5);
-        var snd = GrainBuf.ar(1, trig, dur, sndBufs[i], rate: Rand(0.5, 2), pos: LFNoise1.ar(ExpRand(0.05, 0.5)).range(0, 1), envbufnum:-1, maxGrains: 64);
+		var snd = GrainBuf.ar(1, trig, dur, sndBufs[i], rate: Rand(0.5, 2), pos: LFNoise1.ar(ExpRand(0.05, 0.5)).range(0, 1), envbufnum:-1, maxGrains: 64);
 		// snd = PanAz.ar(~nChans, snd, TRand.ar(-1, 1, trig));
 		snd = PanAz.ar(~nChans, snd, LFNoise1.ar(ExpRand(0.1, 0.7)));
-        snd = snd * LFNoise1.ar(ExpRand(0.05, 0.1)).range(0, 1) * LFNoise1.ar(ExpRand(0.01, 0.03)).range(0.5, 1);
+		snd = snd * LFNoise1.ar(ExpRand(0.05, 0.1)).range(0, 1) * LFNoise1.ar(ExpRand(0.01, 0.03)).range(0.5, 1);
 		snd;
-    });
+	});
 
 	// sig = sig * SinOsc.kr(ExpRand(0.01,0.05)).range(0, 1);
-    sig * -18.dbamp;
+	sig * -18.dbamp;
 }.play;
 )
 
@@ -323,3 +328,28 @@ var sndBuf = ~audioBufs[file];
 	sig;
 }.play;
 )
+
+
+(
+var file1 = PathName(~paths[\buffers] ++ "Audio/Sources/" ++ ~layers.choose).files.choose.fileName.postln;
+var sndBuf1 = ~audioBufs[file1];
+var file2 = PathName(~paths[\buffers] ++ "Audio/Sources/" ++ ~layers.choose).files.choose.fileName.postln;
+var sndBuf2 = ~audioBufs[file2];
+
+{
+	var in1 = In.ar(\in1.kr(0), 1);
+	var in2 = In.ar(\in2.kr(0), 1);
+	var chain1, chain2, resyn, sig;
+
+	chain1 = FFT(LocalBuf(2048), in1);
+	chain2 = FFT(LocalBuf(2048), in2);
+
+	resyn = PV_Morph(chain1, chain2, 0.5);
+
+	sig = IFFT(resyn) * -12.dbamp;
+
+	sig;
+}.play;
+
+)
+

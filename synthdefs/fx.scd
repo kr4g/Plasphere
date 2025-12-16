@@ -149,6 +149,18 @@ SynthDef(\resoGrains, {
 	Out.ar(\out.kr(0), sig * \amp.kr(1, lag));
 }).add;
 
+SynthDef(\grainSlicer, {
+	var in = In.ar(\in.kr(0), 1);
+	var minRate = \minRate.kr(15);
+	var maxRate = \maxRate.kr(60);
+	var rate = LFNoise1.ar(0.1).exprange(minRate, maxRate);
+	var dur = rate.explin(minRate, maxRate, 0.01, 0.001);
+
+	var sig = GrainIn.ar(1, Impulse.ar(rate), dur, in);
+
+	Out.ar(\out.kr(0), sig * 3.dbamp * \amp.kr(1));
+}).add;
+
 SynthDef(\specFx, {
 	var low, hi, med;
 	var lfoMod = SinOsc.kr(freq: \innerRate.kr(0.0005), phase: Rand(-3pi/2, 3pi/2)).exprange(\minLfoRate.kr(0.001), \maxLfoRate.kr(0.05));
@@ -192,6 +204,21 @@ SynthDef(\specFx, {
 	// sig = XFade2.ar(sig, resyn * 2.dbamp, dryWetLFO * 2 - 1);
 
 	Out.ar(\out.kr(0), sig * 0.dbamp * \amp.kr(1));
+}).add;
+
+SynthDef(\specMorph, {
+	var in1 = In.ar(\in1.kr(0), 1);
+	var in2 = In.ar(\in2.kr(0), 1);
+	var chain1, chain2, resyn, sig;
+
+	chain1 = FFT(LocalBuf(2048/2), in1);
+	chain2 = FFT(LocalBuf(2048/2), in2);
+
+	resyn = PV_Morph(chain1, chain2, 0.5);
+
+	sig = IFFT(resyn) * 2.dbamp;
+
+	Out.ar(\out.kr(0), sig * \amp.kr(1));
 }).add;
 
 SynthDef(\xFaderMono, {
