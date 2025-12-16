@@ -7,7 +7,7 @@ SynthDef(\player, {
 	var start = (\startPos.kr(0) * BufFrames.kr(buf).asInteger);
 	var sig = PlayBuf.ar(1, buf, rate: BufRateScale.kr(buf) * rate, startPos: start, loop: 1);
 
-	sig = sig * Env.asr(\attackTime.kr(10), 1, \releaseTime.kr(10), curve: 4).kr(Done.freeSelf, \gate.kr(1));
+	sig = sig * Env.linen(\attackTime.kr(5), \sustainTime.kr(10), \releaseTime.kr(5), curve: [2, -2]).kr(Done.freeSelf);
 
 	Out.ar(\out.kr(0), sig * 1.dbamp * \amp.kr(1));
 }).add;
@@ -20,7 +20,9 @@ SynthDef(\pvAmb, {
 
 	sig = IFFT(chain, ~win);
 
-	sig = sig * Env.asr(\attackTime.kr(10), 1, \releaseTime.kr(10), curve: 4).kr(Done.freeSelf, \gate.kr(1));
+	sig = FreeVerb.ar(sig, 0.33, 0.9, 0.25);
+
+	sig = sig * Env.linen(\attackTime.kr(5), \sustainTime.kr(10), \releaseTime.kr(5), curve: [2, -2]).kr(Done.freeSelf);
 
 	sig = sig * 3.dbamp * \amp.kr(1);
 
@@ -40,9 +42,9 @@ SynthDef(\grainBuzz, {
 		envbufnum: \envBuf.kr(-1),
 	);
 
-	sig = sig * SinOsc.ar(SinOsc.kr(0.01, Rand(-3pi/2, 3pi/2)).exprange(0.05, 1), 3pi/2).range(0.5, 1).lincurve(0.5, 1, 0.5, 1, 5);
+	sig = sig * SinOsc.ar(SinOsc.kr(0.01, Rand(-3pi/2, 3pi/2)).exprange(0.01, 0.5), 3pi/2).range(0.25, 1).lincurve(0.5, 1, 0.5, 1, 5);
 
-	sig = sig * Env.asr(\attackTime.kr(10), 1, \releaseTime.kr(10), curve: 4).kr(Done.freeSelf, \gate.kr(1));
+	sig = sig * Env.linen(\attackTime.kr(5), \sustainTime.kr(10), \releaseTime.kr(5), curve: [2, -2]).kr(Done.freeSelf);
 
 	Out.ar(\out.kr(0), sig * 1.dbamp * \amp.kr(1));
 }).add;
@@ -54,12 +56,12 @@ SynthDef(\grainTrigs, {
 		var dur = ExpRand(0.001, 0.05);
 		var rate = LFNoise1.ar(0.01).exprange(\minRate.kr(0.5), \maxRate.kr(20));
 		var trig = Impulse.ar(rate);
-		var snd = PanAz.ar(~nChans, TGrains.ar(1, trig, buf, Rand(1.0, 3), pos, dur), LFNoise0.ar(ExpRand(0.2, 0.9)), width: 1);
+		var snd = PanAz.ar(~nChans, TGrains.ar(1, trig, buf, Rand(1.0, 3), pos, dur), LFNoise0.ar(ExpRand(0.2, 0.9)), width: 2);
 		snd = snd * SinOsc.ar(ExpRand(0.1, 0.2)).range(0, 1).lincurve(0, 1, 0, 1, Rand(0.0, 5));
 		snd;
 	});
 
-	sig = sig * Env.asr(\attackTime.kr(1), 1, \releaseTime.kr(10), curve: 4).kr(Done.freeSelf, \gate.kr(1));
+	sig = sig * Env.linen(\attackTime.kr(5), \sustainTime.kr(10), \releaseTime.kr(5), curve: [2, -2]).kr(Done.freeSelf);
 
 	Out.ar(\out.kr(0), sig * 3.dbamp * \amp.kr(1));
 }).add;
@@ -68,7 +70,7 @@ SynthDef(\grainTrigs, {
 
 SynthDef(\granStorm, {
 	var dur = \duration.kr(20);
-	var sig = Mix.fill(8, {
+	var sig = Mix.fill(4, {
 		var minRate = \minRate.kr(15);
 		var maxRate = \maxRate.kr(50);
 		var rateScaleMin = \rateScaleMin.kr(0.9);
@@ -85,7 +87,7 @@ SynthDef(\granStorm, {
 			envbufnum: \envBuf.kr(-1),
 		);
 		// snd = snd * SinOsc.ar(ExpRand(0.01, 0.1)).range(0.75, 1);
-		snd = PanAz.ar(~nChans, snd, SinOsc.ar(XLine.ar(0.1, 1, timeScale)), width: 1);
+		snd = PanAz.ar(~nChans, snd, Rand(-1.0, 1.0), width: 1);
 		snd = snd * EnvGen.ar(
 			Env.new(times: [0.95, 0.05], curve: [Rand(16.0, 32), 2]),
 			1,

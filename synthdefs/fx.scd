@@ -3,8 +3,8 @@ SynthDef(\ampModMono, {
 	var sig = In.ar(\in.kr(0), 1);
 	var minAmp = \minAmp.kr(0);
 
-	sig = sig * SinOsc.ar(SinOsc.kr(\innerRate.kr(0.01), Rand(-3pi/2, 3pi/2)).exprange(0.1, 0.15), Rand(-3pi/2, 3pi/2)).range(0.67, 1);
-	sig = sig * SinOsc.ar(SinOsc.kr(\outerRate.kr(0.01), Rand(-3pi/2, 3pi/2)).exprange(0.05, 0.1), Rand(-3pi/2, 3pi/2)).range(minAmp, 1).lincurve(minAmp, 1, minAmp, 1, \curve.kr(0));
+	sig = sig * SinOsc.ar(SinOsc.kr(\innerRate.kr(0.005), Rand(-3pi/2, 3pi/2)).exprange(0.01, 0.1), Rand(-3pi/2, 3pi/2)).range(0.67, 1);
+	sig = sig * SinOsc.ar(SinOsc.kr(\outerRate.kr(0.001), Rand(-3pi/2, 3pi/2)).exprange(0.01, 0.1), Rand(-3pi/2, 3pi/2)).range(minAmp, 1).lincurve(minAmp, 1, minAmp, 1, \curve.kr(0));
 
 	Out.ar(\out.kr(0), sig * 3.dbamp * \amp.kr(1, \lag.kr(5)));
 }).add;
@@ -24,15 +24,15 @@ SynthDef(\eqMorph, {
 	var dry = In.ar(\in.kr(0), 1);
 
 	low = LPF.ar(dry, 350) * SinOsc.ar(ExpRand(0.05, 0.1), Rand(-3pi/2, 3pi/2)).range(0, 1);
-	low = PanAz.ar(~nChans, low, LFNoise1.ar(ExpRand(0.05, 0.1)), width: 1);
+	low = PanAz.ar(~nChans, low, LFNoise1.ar(ExpRand(0.01, 0.05)), width: 2);
 
 	hi = HPF.ar(dry, 1500) * SinOsc.ar(ExpRand(0.05, 0.1), Rand(-3pi/2, 3pi/2)).range(0, 1);
-	hi = PanAz.ar(~nChans, hi, LFNoise1.ar(ExpRand(0.05, 0.1)), width: 1);
+	hi = PanAz.ar(~nChans, hi, LFNoise1.ar(ExpRand(0.01, 0.05)), width: 2);
 
 	sig = Mix.fill(8, { |i|
 		var snd = BPF.ar(dry, i.linexp(0, 7, 350, 1500), \rq.kr(0.4), \mul.kr(1));
 		snd = snd * SinOsc.ar(ExpRand(0.05, 0.1), Rand(-3pi/2, 3pi/2)).range(0, 1);
-		snd = PanAz.ar(~nChans, snd, LFNoise1.ar(ExpRand(0.05, 0.1)), width: 1);
+		snd = PanAz.ar(~nChans, snd, LFNoise1.ar(ExpRand(0.05, 0.1)), width: 2);
 		snd;
 	});
 
@@ -50,8 +50,8 @@ SynthDef(\resoMorph, {
 	var dry = In.ar(\in.kr(0), 1);
 	var lfoMod = SinOsc.kr(freq: \innerRate.kr(0.0005), phase: Rand(-3pi/2, 3pi/2)).exprange(\minLfoRate.kr(0.001), \maxLfoRate.kr(0.05));
 	var dryWetLFO = SinOsc.kr(freq: lfoMod, phase: Rand(-3pi/2, 3pi/2)).range(0, \depth.kr(1)).lincurve(0, \depth.kr, 0, \depth.kr, \curve.kr(3));
-	var minFreq = \minFreq.kr(50);
-	var maxFreq = \maxFreq.kr(700);
+	var minFreq = \minFreq.kr(55);
+	var maxFreq = \maxFreq.kr(900);
 	var rqMin = \rqMin.kr(0.01);
 	var rqMax = \rqMax.kr(0.0001);
 	var ratio = \ratio.kr(1) * LFNoise1.kr(0.01).range(0.9, 1.3);
@@ -73,11 +73,11 @@ SynthDef(\resoMorph, {
 		var ps = PitchShift.ar(snd, 0.2, LFNoise0.kr(ExpRand(0.1, 0.5)).exprange(0.5, 2), 0.01, 0.001, mul: 1);
 		ps = DelayL.ar(ps, 1, Rand(0.5, 1));
 
-		ps = PanAz.ar(~nChans, ps, LFNoise1.ar(SinOsc.kr(0.1, Rand(-3pi/2, 3pi/2)).exprange(0.1, 0.8)), width: 1);
-		snd = PanAz.ar(~nChans, snd, LFNoise1.ar(SinOsc.kr(0.1, Rand(-3pi/2, 3pi/2)).exprange(0.1, 0.8)), width: 1);
+		ps = PanAz.ar(~nChans, ps, LFNoise1.ar(SinOsc.kr(0.1, Rand(-3pi/2, 3pi/2)).exprange(0.01, 0.1)), width: 2);
+		snd = PanAz.ar(~nChans, snd, LFNoise1.ar(SinOsc.kr(0.1, Rand(-3pi/2, 3pi/2)).exprange(0.01, 0.1)), width: 2);
 
-		ps = ps * SinOsc.ar(SinOsc.kr(0.2, Rand(-3pi/2, 3pi/2)).exprange(0.25, 0.5)).range(0.5, 1);//.lincurve(0, 1, 0, 1, Rand(0.0, 2));
-		snd = snd * SinOsc.ar(SinOsc.kr(0.1, Rand(-3pi/2, 3pi/2)).exprange(0.1, 0.25)).range(0.5, 1);//.lincurve(0, 1, 0, 1, Rand(0.0, 2));
+		ps = ps * SinOsc.ar(SinOsc.kr(0.02, Rand(-3pi/2, 3pi/2)).exprange(0.05, 0.1)).range(0.5, 1);//.lincurve(0, 1, 0, 1, Rand(0.0, 2));
+		snd = snd * SinOsc.ar(SinOsc.kr(0.01, Rand(-3pi/2, 3pi/2)).exprange(0.05, 0.1)).range(0.5, 1);//.lincurve(0, 1, 0, 1, Rand(0.0, 2));
 
 		snd = snd + ps;
 		snd;
@@ -85,15 +85,14 @@ SynthDef(\resoMorph, {
 
 	sig = FreeVerb.ar(sig, \verbMix.kr(0.33), 0.9, 0.01, 3.dbamp);
 
-
 	low = LPF.ar(dry, 250);// * SinOsc.ar(ExpRand(0.05, 0.1), Rand(-3pi/2, 3pi/2)).range(0.5, 1);
-	low = PanAz.ar(~nChans, low, LFNoise1.ar(0.05), width: 1);
+	low = PanAz.ar(~nChans, low, LFNoise1.ar(0.02), width: 2);
 
 	med = LPF.ar(HPF.ar(dry, 250), 1100);
-	med = PanAz.ar(~nChans, med, LFNoise1.ar(0.08), width: 1);
+	med = PanAz.ar(~nChans, med, LFNoise1.ar(0.03), width: 2);
 
 	hi = HPF.ar(dry, 1100);// * SinOsc.ar(ExpRand(0.05, 0.1), Rand(-3pi/2, 3pi/2)).range(0.15, 0.5);
-	hi = PanAz.ar(~nChans, hi, LFNoise1.ar(0.13), width: 1);
+	hi = PanAz.ar(~nChans, hi, LFNoise1.ar(0.05), width: 2);
 
 	dry = low + med + hi;
 
@@ -125,7 +124,7 @@ SynthDef(\resoGrains, {
 		snd = GrainIn.ar(1, Impulse.ar(rate), rate.explin(minRate, maxRate, 0.03, 0.002), snd);
 		// snd = DelayL.ar(snd, 3, Rand(0.5, 3));
 		// snd = CombL.ar(snd, 0.5, Rand(0.1, 0.5), 1);
-		snd = PanAz.ar(~nChans, snd, LFNoise1.ar(SinOsc.kr(0.06, Rand(-3pi/2, 3pi/2)).exprange(0.1, 0.9)), width: 1);
+		snd = PanAz.ar(~nChans, snd, LFNoise1.ar(SinOsc.kr(0.06, Rand(-3pi/2, 3pi/2)).exprange(0.01, 0.1)), width: 1);
 		snd = snd * SinOsc.ar(SinOsc.kr(0.05, Rand(-3pi/2, 3pi/2)).exprange(0.1, 0.3), 3pi/2).range(0, 1);
 		snd;
 	});
@@ -133,13 +132,13 @@ SynthDef(\resoGrains, {
 	// sig = LPF.ar(sig, 1500);
 
 	low = LPF.ar(dry, 250);// * SinOsc.ar(ExpRand(0.05, 0.1), Rand(-3pi/2, 3pi/2)).range(0.5, 1);
-	low = PanAz.ar(~nChans, low, LFNoise1.ar(0.05), width: 1);
+	low = PanAz.ar(~nChans, low, LFNoise1.ar(0.03), width: 1);
 
 	med = LPF.ar(HPF.ar(dry, 250), 1100);
-	med = PanAz.ar(~nChans, med, LFNoise1.ar(0.08), width: 1);
+	med = PanAz.ar(~nChans, med, LFNoise1.ar(0.05), width: 1);
 
 	hi = HPF.ar(dry, 1100);// * SinOsc.ar(ExpRand(0.05, 0.1), Rand(-3pi/2, 3pi/2)).range(0.15, 0.5);
-	hi = PanAz.ar(~nChans, hi, LFNoise1.ar(0.13), width: 1);
+	hi = PanAz.ar(~nChans, hi, LFNoise1.ar(0.08), width: 1);
 
 	dry = low + med + hi;
 
@@ -180,13 +179,13 @@ SynthDef(\specFx, {
 	// sig = [l, r];
 
 	low = LPF.ar(resyn, 250);// * SinOsc.ar(ExpRand(0.05, 0.1), Rand(-3pi/2, 3pi/2)).range(0, 0.7);
-	low = PanAz.ar(~nChans, low, LFNoise1.ar(0.08), width: 1);
+	low = PanAz.ar(~nChans, low, LFNoise1.ar(0.08), width: 3);
 
 	hi = HPF.ar(resyn, 1100);// * SinOsc.ar(ExpRand(0.05, 0.1), Rand(-3pi/2, 3pi/2)).range(0, 0.25);
-	hi = PanAz.ar(~nChans, hi, LFNoise1.ar(0.13), width: 1);
+	hi = PanAz.ar(~nChans, hi, LFNoise1.ar(0.13), width: 3);
 
 	med = LPF.ar(HPF.ar(resyn, 250), 1100);
-	med = PanAz.ar(~nChans, med, LFNoise1.ar(0.21), width: 1);
+	med = PanAz.ar(~nChans, med, LFNoise1.ar(0.21), width: 3);
 
 	sig = low + med + hi;
 	//
@@ -226,5 +225,13 @@ SynthDef(\verbStereo, {
 	// sig = FreeVerb.ar(sig, \mix.kr(0.33), \room.kr(0.5), \damp.kr(0.5));
 	// sig = GVerb.ar(sig, roomsize: \roomsize.kr(250), revtime: \revtime.kr(5), damping: \damping.kr(0.5), drylevel: \drylevel.kr(0.5));
 	Out.ar(\out.kr(0), sig * 0.dbamp);
+}).add;
+
+SynthDef(\main, {
+	var in = In.ar(\in.kr(0), ~nChans);
+	var sig = HPF.ar(in, 55);
+	var sub = LPF.ar(in, 55);
+	ReplaceOut.ar(\out.kr(0), sig * \amp.kr(0.25));
+	ReplaceOut.ar(\outSub.kr(0), sub * \ampSub.kr(0.25));
 }).add;
 )

@@ -96,7 +96,7 @@ var layer = ~layers.choose;
 var file = PathName(~paths[\buffers] ++ "Audio/Sources/" ++ layer).files.choose.fileName;
 var sndBuf = ~audioBufs[file];
 "%, %".format(layer, file).postln;
-Synth(\grainTrigs, [buf: sndBuf, maxRate: rrand(10.0, 60), amp: -12.dbamp]);
+Synth(\grainBuzz, [buf: sndBuf, maxRate: rrand(10.0, 60), amp: -12.dbamp]);
 )
 
 

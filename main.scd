@@ -2,15 +2,17 @@ ServerOptions.devices.do{ |device| device.postln; };
 (
 Server.killAll;
 Buffer.freeAll;
-~nChans = 2;
-// ~nOuts = ~nChans * 8;
-~sr = 48000;
+~nChans = 19 - 1;
+~nOuts = ~nChans + 1;
+// ~sr = 48000;
+~sr = 44100;
 
 ~paths = Dictionary.new();
 
 s = Server.local;
 s.options.outDevice_(
-	"MacBook Pro Speakers"
+	"Dante Virtual Soundcard"
+	// "MacBook Pro Speakers"
 	// "External Headphones"
 	// "ZoomAudioD"
 	// "Audio Out"
@@ -18,10 +20,11 @@ s.options.outDevice_(
 	// "Scarlett 4i4 USB"
 );
 // s.options.inDevice_("Built-in Microph");
-s.options.numOutputBusChannels_(~nChans);
 s.options.numInputBusChannels_(0);
-s.options.sampleRate_(~sr);
+s.options.numOutputBusChannels_(~nOuts);
 s.options.memSize_(2.pow(20));
+s.options.sampleRate_(~sr);
+s.options.numWireBufs = 1024;
 s.newBusAllocators;
 
 s.waitForBoot({
