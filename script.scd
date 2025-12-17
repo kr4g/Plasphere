@@ -2,10 +2,10 @@
 s.newBusAllocators;
 
 ~amps = Dictionary.newFrom([
-	"water", 8.dbamp,
-	"land", 2.dbamp,
-	"humans", -6.dbamp,
-	"machines", -8.dbamp,
+	"water", 4.dbamp,
+	"land", 3.dbamp,
+	"humans", -4.dbamp,
+	"machines", -12.dbamp,
 ]);
 
 ~durs = Dictionary.newFrom([
@@ -59,18 +59,18 @@ s.newBusAllocators;
 
 ~synths = Dictionary.new();
 
-// s.record(path:"/Users/ryanmillett/Downloads/Plas_Test.wav", numChannels: ~nOuts);
+s.record(path:"/Users/ryanmillett/Downloads/Plas_Test3.wav", numChannels: ~nOuts);
 
 fork {
 	s.sync;
 
 	// WATER
-	Synth(\ampModMono, [in: ~waterBus1, minAmp: 0.5, out: ~waterAmpBus1], s, \addToTail);
-	Synth(\ampModMono, [in: ~waterBus2, minAmp: 0.5, out: ~waterAmpBus2], s, \addToTail);
-	Synth(\resoMorph, [in: ~waterAmpBus1, out: ~waterXFade1, depth: 1, innerRate: 0.01, outerRate: 0.005, minLfoRate: 0.02, maxLfoRate: 0.2], s, \addToTail);
-	Synth(\resoGrains, [in: ~waterAmpBus2, out: ~waterXFade2, depth: 1, innerRate: 0.01, outerRate: 0.005, minLfoRate: 0.02, maxLfoRate: 0.2], s, \addToTail);
+	Synth(\ampModMono, [in: ~waterBus1, minAmp: 0.6, out: ~waterAmpBus1], s, \addToTail);
+	Synth(\ampModMono, [in: ~waterBus2, minAmp: 0.6, out: ~waterAmpBus2], s, \addToTail);
+	Synth(\resoMorph, [in: ~waterAmpBus1, out: 0, depth: 1, innerRate: 0.01, outerRate: 0.005, minLfoRate: 0.02, maxLfoRate: 0.2], s, \addToTail);
+	Synth(\resoGrains, [in: ~waterAmpBus2, out: 0, depth: 1, innerRate: 0.01, outerRate: 0.005, minLfoRate: 0.02, maxLfoRate: 0.2], s, \addToTail);
 
-	Synth(\xFaderStereo, [in1: ~waterXFade1, in2: ~waterXFade2, depth: 1, out: 0], s, \addToTail);
+	// Synth(\xFaderStereo, [in1: ~waterXFade1, in2: ~waterXFade2, depth: 1, out: 0], s, \addToTail);
 
 	Synth(\eqMorph, [in: ~waterPvBus, out: 0], s, \addToTail);
 
@@ -109,17 +109,17 @@ fork {
 
 
 	// GRAIN MORPHS
-	// Synth(\specMorph, [in1: ~grainMorph1, in2: ~grainMorph2, out: ~grainMorph], s, \addToTail);
-	Synth(\eqMorph, [in: ~grainMorph, out: 0], s, \addToTail);
+	Synth(\eqMorph, [in: ~grainMorph1, out: 0], s, \addToTail);
+	Synth(\eqMorph, [in: ~grainMorph2, out: 0], s, \addToTail);
 
-	~mainSynth = Synth.tail(nil, \main, [amp: 0.2, ampSub: 0.2, out: 0, outSub: ~nChans]);
+	~mainSynth = Synth.tail(nil, \main, [amp: 0.2, ampSub: 0.15, out: 0, outSub: ~nChans]);
 
 	s.sync;
 
 	fork { ~waterRoutine.reset.play; };
 
 	fork {
-		rrand(15.0, 90).wait;
+		rrand(15.0, 60).wait;
 		~landRoutine.reset.play;
 	};
 
@@ -152,4 +152,4 @@ fork {
 };
 )
 
-~mainSynth.set(\amp, 0.2, \ampSub, 0.2);
+~mainSynth.set(\amp, 0.2, \ampSub, 0.15);

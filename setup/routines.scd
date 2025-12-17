@@ -68,7 +68,7 @@
 
 				playSynth = Synth(\player, [
 					buf: buf,
-					amp: ~amps["land"] * -5.dbamp,
+					amp: ~amps["land"] * -3.dbamp,
 					rate: rrand(0.8, 1),
 					startPos: rrand(0.0, 0.5),
 					attackTime: dur * 0.25,
@@ -82,7 +82,7 @@
 						var gBuf = PathName(~paths[\buffers] ++ "Audio/Sources/land").files.choose.fileName;
 						synths[i] = Synth(\grainTrigs, [
 							buf: gBuf,
-							amp: ~amps["land"] * 3.dbamp,
+							amp: ~amps["land"] * 9.dbamp,
 							minRate: rrand(0.5, 1),
 							maxRate: rrand(20.0, 60),
 							attackTime: rrand(dur * 0.1, dur * 0.25),
@@ -104,7 +104,7 @@
 
 				pvSynth = Synth(\pvAmb, [
 					buf: spec,
-					amp: ~amps["land"] * rrand(0.15, 0.5),
+					amp: ~amps["land"] * rrand(0.05, 0.15),
 					maxRate: exprand(0.1, 0.2),
 					offset: 0,
 					attackTime: 10,
@@ -150,7 +150,7 @@
 	if (rand(1.0) < 0.5) {
 		pvSynth = Synth(\pvAmb, [
 			buf: spec,
-			amp: ~amps[layer] * rrand(0.15, 0.5),
+			amp: ~amps[layer] * rrand(0.1, 0.2),
 			maxRate: exprand(0.1, 0.2),
 			offset: 0,
 			attackTime: 10,
@@ -215,6 +215,7 @@
 			attackTime: duration * 0.25,
 			sustainTime: duration * 0.5,
 			releaseTime: duration * 0.25,
+			maxRate: rrand(20.0, 40),
 			out: ~machinesPlayBus],
 		s, \addToHead);
 	};
@@ -241,14 +242,14 @@
 		var layer = ~layers.choose;
 		var file = PathName(~paths[\buffers] ++ "Audio/Sources/" ++ layer).files.choose.fileName;
 		var buf = ~audioBufs[file], spec = ~specBufs[file.replace(".wav", "_spec.wav")];
-		Synth(\granStorm, [buf: buf, duration: rrand(10.0, 30), amp: rrand(-18.dbamp, -8.dbamp).dbamp, out: ~streamsBus]);
+		Synth(\granStorm, [buf: buf, duration: rrand(10.0, 30), amp: rrand(-12, -1).dbamp, out: ~streamsBus]);
 		rrand(0.5, 3).wait;
 	};
 });
 
 // GRAIN MORPHS
 ~grainMorphsRoutine = Routine({
-	8.do{
+	8.do{ |i|
 		var file1 = PathName(~paths[\buffers] ++ "Audio/Sources/" ++ ["humans", "machines"].choose).files.choose.fileName.postln;
 		var sndBuf1 = ~audioBufs[file1];
 		var file2 = PathName(~paths[\buffers] ++ "Audio/Sources/" ++ ["water", "land"].choose).files.choose.fileName.postln;
@@ -256,7 +257,7 @@
 
 		var atk = rrand(5, 20);
 		var rel = rrand(5, 20);
-		var sus = rrand(atk + rel * 2, atk + rel * 4);
+		var sus = rrand(atk + rel, atk + rel * 2);
 
 		Synth(\grainMorpher, [
 			buf1: sndBuf1,
@@ -264,7 +265,8 @@
 			attackTime: atk,
 			sustatinTime: sus,
 			releaseTime: rel,
-			out: ~grainMorph
+			amp: rrand(-16, -1).dbamp,
+			out: [~grainMorph1, ~grainMorph2][i % 2]
 		]);
 		// Synth(\grainBuzz, [
 		// 	buf: sndBuf1,

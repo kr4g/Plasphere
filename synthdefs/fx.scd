@@ -255,7 +255,7 @@ SynthDef(\verbStereo, {
 }).add;
 
 SynthDef(\main, {
-	var in = In.ar(\in.kr(0), ~nChans);
+	var in = Limiter.ar(In.ar(\in.kr(0), ~nChans), -6.dbamp);
 	var sig = HPF.ar(in, 55);
 	var sub = LPF.ar(in, 55);
 	ReplaceOut.ar(\out.kr(0), sig * \amp.kr(0.25));

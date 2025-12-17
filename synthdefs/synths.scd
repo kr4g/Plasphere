@@ -63,7 +63,7 @@ SynthDef(\grainTrigs, {
 
 	sig = sig * Env.linen(\attackTime.kr(5), \sustainTime.kr(10), \releaseTime.kr(5), curve: [2, -2]).kr(Done.freeSelf);
 
-	Out.ar(\out.kr(0), sig * 3.dbamp * \amp.kr(1));
+	Out.ar(\out.kr(0), sig * 5.dbamp * \amp.kr(1));
 }).add;
 
 SynthDef(\grainMorpher, {
@@ -77,7 +77,7 @@ SynthDef(\grainMorpher, {
 	var in2 = PlayBuf.ar(1, buf2, rate: BufRateScale.kr(buf2) * rate2, startPos: start2, loop: 1).sum;
 	var chain1, chain2, resyn, sig;
 	var minRate = 15, maxRate = 60;
-	var rate = LFNoise1.kr(ExpRand(0.1, 0.7)).exprange(minRate, maxRate);
+	var rate = LFNoise1.kr(ExpRand(0.1, 1.7)).exprange(minRate, maxRate);
 
 	chain1 = FFT(LocalBuf(2048*2), in1);
 	chain2 = FFT(LocalBuf(2048*2), in2);
@@ -89,8 +89,10 @@ SynthDef(\grainMorpher, {
 		Impulse.ar(rate),
 		rate.explin(minRate, maxRate, 0.01, 0.005),
 		resyn,
-		mul: 4.dbamp
+		mul: 2.dbamp
 	);
+
+	sig = sig * LFNoise1.ar(ExpRand(0.2, 1.1)).range(0.5, 1) * SinOsc.ar(ExpRand(0.1, 0.5), 3pi/2).range(0.7, 1);
 
 	sig = sig * Env.linen(\attackTime.kr(5), \sustainTime.kr(10), \releaseTime.kr(5), curve: [2, -2]).kr(Done.freeSelf);
 
