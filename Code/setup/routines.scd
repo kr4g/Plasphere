@@ -7,7 +7,7 @@
 				var file = PathName(~paths[\buffers] ++ "Audio/Sources/water").files.choose.fileName;
 				var playSynth, pvSynth, dur, buf;
 
-				("[water] " ++ file).postln;
+				// ("[water] " ++ file).postln;
 
 				buf = ~audioBufs[file];
 				// f = ~specBufs[file.replace(".wav", "_spec.wav")];
@@ -51,7 +51,7 @@
 		// ~synths["waterFx"].set(\lag, duration * 0.3, \amp, -22.dbamp);
 
 		endTime = Main.elapsedTime + duration;
-		("Starting land layer for " ++ duration.round(0.1) ++ " seconds").postln;
+		// ("Starting land layer for " ++ duration.round(0.1) ++ " seconds").postln;
 
 		fork {
 			while { Main.elapsedTime < endTime } {
@@ -59,7 +59,7 @@
 
 				var playSynth, granSynth, dur, buf;
 
-				("[land] " ++ file).postln;
+				// ("[land] " ++ file).postln;
 				// ("[land] " ++ file2).postln;
 
 				buf = ~audioBufs[file];
@@ -131,8 +131,8 @@
 	// ~synths["waterFx"].set(\lag, duration * 0.3, \amp, -22.dbamp);
 
 	endTime = Main.elapsedTime + duration;
-	("Starting % layer for ".format(layer) ++ duration.round(0.1) ++ " seconds").postln;
-	("[%] ".format(layer) ++ file).postln;
+	// ("Starting % layer for ".format(layer) ++ duration.round(0.1) ++ " seconds").postln;
+	// ("[%] ".format(layer) ++ file).postln;
 
 	playSynth = Synth(\player, [
 		buf: buf,
@@ -170,7 +170,7 @@
 
 	dur = rrand(buf.duration * 0.5, buf.duration);
 
-	("Starting boat cpt layer for " ++ dur.round(0.1) ++ " seconds").postln;
+	// ("Starting boat cpt layer for " ++ dur.round(0.1) ++ " seconds").postln;
 
 	playSynth = Synth(\player, [
 		buf: buf,
@@ -194,8 +194,8 @@
 	// ~synths["waterFx"].set(\lag, duration * 0.3, \amp, -22.dbamp);
 
 	endTime = Main.elapsedTime + duration;
-	("Starting % layer for ".format(layer) ++ duration.round(0.1) ++ " seconds").postln;
-	("[%] ".format(layer) ++ file).postln;
+	// ("Starting % layer for ".format(layer) ++ duration.round(0.1) ++ " seconds").postln;
+	// ("[%] ".format(layer) ++ file).postln;
 
 	if (rand(1.0) < 0.5) {
 		playSynth = Synth(\player, [
@@ -250,9 +250,9 @@
 // GRAIN MORPHS
 ~grainMorphsRoutine = Routine({
 	8.do{ |i|
-		var file1 = PathName(~paths[\buffers] ++ "Audio/Sources/" ++ ["humans", "machines"].choose).files.choose.fileName.postln;
+		var file1 = PathName(~paths[\buffers] ++ "Audio/Sources/" ++ ["humans", "machines"].choose).files.choose.fileName;
 		var sndBuf1 = ~audioBufs[file1];
-		var file2 = PathName(~paths[\buffers] ++ "Audio/Sources/" ++ ["water", "land"].choose).files.choose.fileName.postln;
+		var file2 = PathName(~paths[\buffers] ++ "Audio/Sources/" ++ ["water", "land"].choose).files.choose.fileName;
 		var sndBuf2 = ~audioBufs[file2];
 
 		var atk = rrand(5, 20);

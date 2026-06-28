@@ -1,0 +1,11 @@
+# Audio buffers are downloaded separately (see README), not tracked in git
+/Buffers/
+
+# Recordings / rendered audio
+*.wav
+*.aiff
+*.aif
+*.flac
+
+# macOS
+.DS_Store

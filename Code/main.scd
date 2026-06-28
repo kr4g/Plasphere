@@ -2,7 +2,7 @@ ServerOptions.devices.do{ |device| device.postln; };
 (
 Server.killAll;
 Buffer.freeAll;
-~nChans = 19 - 1;
+~nChans = 3 - 1;
 ~nOuts = ~nChans + 1;
 // ~sr = 48000;
 ~sr = 44100;
@@ -11,8 +11,8 @@ Buffer.freeAll;
 
 s = Server.local;
 s.options.outDevice_(
-	"Dante Virtual Soundcard"
-	// "MacBook Pro Speakers"
+	// "Dante Virtual Soundcard"
+	"MacBook Pro Speakers"
 	// "External Headphones"
 	// "ZoomAudioD"
 	// "Audio Out"

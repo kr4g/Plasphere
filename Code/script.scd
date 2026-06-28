@@ -59,7 +59,7 @@ s.newBusAllocators;
 
 ~synths = Dictionary.new();
 
-s.record(path:"/Users/ryanmillett/Downloads/Plas_Test3.wav", numChannels: ~nOuts);
+// s.record(path:"/Users/ryanmillett/Downloads/Plas_Test3.wav", numChannels: ~nOuts);
 
 fork {
 	s.sync;
@@ -112,7 +112,7 @@ fork {
 	Synth(\eqMorph, [in: ~grainMorph1, out: 0], s, \addToTail);
 	Synth(\eqMorph, [in: ~grainMorph2, out: 0], s, \addToTail);
 
-	~mainSynth = Synth.tail(nil, \main, [amp: 0.2, ampSub: 0.15, out: 0, outSub: ~nChans]);
+	~mainSynth = Synth.tail(nil, \main, [amp: 0.85, ampSub: 0.5, out: 0, outSub: ~nChans]);
 
 	s.sync;
 
@@ -151,5 +151,3 @@ fork {
 	};
 };
 )
-
-~mainSynth.set(\amp, 0.2, \ampSub, 0.15);
